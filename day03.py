@@ -32,7 +32,7 @@ def coordinate(value):
         else:
             pos += heading * side_length
             delta -= side_length
-            heading = heading * 1j #rotate CCW ninety degrees
+            heading *= 1j #rotate CCW ninety degrees
     return (int(pos.real), int(pos.imag))
 
 #part 1
@@ -45,9 +45,7 @@ grid = {(0,0): 1}
 deltas = [(x,y) for x in range(-1, 2) for y in range(-1, 2) if (x,y) != (0,0)]
 for i in itertools.count(2):
     x,y = coordinate(i)
-    value = 0
-    for dx, dy in deltas:
-        value += grid.get((x+dx, y+dy), 0)
+    value = sum(grid.get((x+dx, y+dy), 0) for dx, dy in deltas)
     grid[x,y] = value
     if value > target: break
 print(value)
