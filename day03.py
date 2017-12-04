@@ -23,20 +23,17 @@ def coordinate(value):
     side_length = smallest_odd_root - 1 #not to be confused with the width of the entire ring, which is one larger than this
     delta = value_at_corner - value
 
-    x,y = ring, ring
-    if delta <= side_length:          #case 1: value is on bottom edge of the ring
-        x -= delta
-    elif delta < side_length * 2:     #case 2: value is on left edge of the ring
-        x -= side_length
-        y -= delta % side_length
-    elif delta < side_length * 3:     #case 3: value is on top edge of the ring
-        x -= side_length
-        y -= side_length
-        x += delta % side_length
-    else:                             #case 4: value is on right edge of the ring
-        y -= side_length
-        y += delta % side_length
-    return x,y
+    pos = complex(ring, ring)
+    heading = -1+0j
+    for _ in range(4):
+        if delta <= side_length:
+            pos += heading * delta
+            break
+        else:
+            pos += heading * side_length
+            delta -= side_length
+            heading = heading * 1j #rotate CCW ninety degrees
+    return (int(pos.real), int(pos.imag))
 
 #part 1
 target = 265149
