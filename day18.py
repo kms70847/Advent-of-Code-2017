@@ -32,7 +32,7 @@ class Thread:
             else:
                 #part 1 style behavior
                 self.last_played = self.get(args[0])
-        elif op== "rcv":
+        elif op == "rcv":
             if self.buddy:
                 #part 2 style behavior
                 self.registers[args[0]] = self.queue.pop(0)
@@ -54,8 +54,6 @@ class Thread:
             if self.get(args[0]) > 0:
                 self.pc += self.get(args[1])
                 return
-        else:
-            raise Exception(f"op {op} not implemented yet")
         self.pc += 1
 
 #part 1
