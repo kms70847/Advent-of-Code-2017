@@ -1,0 +1,254 @@
+########## ver 0.1 - the raw input ##########
+
+set b 84
+set c b
+jnz a 2
+jnz 1 5
+mul b 100
+sub b -100000
+set c b
+sub c -17000
+set f 1
+set d 2
+set e 2
+set g d
+mul g e
+sub g b
+jnz g 2
+set f 0
+sub e -1
+set g e
+sub g b
+jnz g -8
+sub d -1
+set g d
+sub g b
+jnz g -13
+jnz f 2
+sub h -1
+set g b
+sub g c
+jnz g 2
+jnz 1 3
+sub b -17
+jnz 1 -23
+
+########## ver 0.2 - jump with labels rather than offsets ##########
+#I'll start labeling at P, just to keep the labels distinct from registers a-h
+
+set b 84
+set c b
+jnz a P
+jnz 1 Q
+P: mul b 100
+sub b -100000
+set c b
+sub c -17000
+Q: set f 1
+set d 2
+T: set e 2
+S: set g d
+mul g e
+sub g b
+jnz g R
+set f 0
+R: sub e -1
+set g e
+sub g b
+jnz g S
+sub d -1
+set g d
+sub g b
+jnz g T
+jnz f U
+sub h -1
+U: set g b
+sub g c
+jnz g V
+jnz 1 W
+V: sub b -17
+jnz 1 Q
+W: #out of bounds
+
+########## ver 0.3 - replace forward jumps with conditionals ##########
+
+set b 84
+set c b
+if a != 0:
+    mul b 100
+    sub b -100000
+    set c b
+    sub c -17000
+Q: set f 1
+set d 2
+T: set e 2
+S: set g d
+mul g e
+sub g b
+if g == 0:
+    set f 0
+sub e -1
+set g e
+sub g b
+jnz g S
+sub d -1
+set g d
+sub g b
+jnz g T
+if f == 0:
+    sub h -1
+set g b
+sub g c
+if g == 0:
+    exit()
+sub b -17
+jnz 1 Q
+
+########## ver 0.4 - replace backward jumps with whiles or do-whiles ##########
+#Yes, I know Python doesn't have do-whiles. Nobody's perfect.
+
+set b 84
+set c b
+if a != 0:
+    mul b 100
+    sub b -100000
+    set c b
+    sub c -17000
+while True:
+    set f 1
+    set d 2
+    do{
+        set e 2
+        do{
+            set g d
+            mul g e
+            sub g b
+            if g == 0:
+                set f 0
+            sub e -1
+            set g e
+            sub g b
+        }(while g != 0);
+        sub d -1
+        set g d
+        sub g b
+    }(while g != 0);
+    if f == 0:
+        sub h -1
+    set g b
+    sub g c
+    if g == 0:
+        exit()
+    sub b -17
+
+########## ver 0.5 - replace arithmetic ops with nicer looking ones ##########
+
+b = c = 84
+if a != 0:
+    b *= 100
+    b += 100000
+    c = b
+    c += 17000
+while True:
+    f = 1
+    d = 2
+    do{
+        e = 2
+        do{
+            g = d
+            g *= e
+            g -= b
+            if g == 0:
+                f = 0
+            e += 1
+            g = e
+            g -= b
+        }(while g != 0);
+        d += 1
+        g = d
+        g -= b
+    }(while g != 0);
+    if f == 0:
+        h +=1
+    g = b
+    g -= c
+    if g == 0:
+        exit()
+    b += 17
+
+########## ver 0.6 - combine consecutive arithmetic ##########
+
+b = c = 84
+if a != 0:
+    b = b*100 + 100000
+    c = b + 17000
+while True:
+    f = 1
+    d = 2
+    do{
+        e = 2
+        do{
+            g = (d * e) - b
+            if g == 0:
+                f = 0
+            e += 1
+            g = e - b
+        }(while g != 0);
+        d += 1
+        g = d - b
+    }(while g != 0);
+    if f == 0:
+        h +=1
+    g = b - c
+    if g == 0:
+        exit()
+    b += 17
+
+########## ver 0.6 - refactor g ##########
+#notice that most of the time, g is used only as a temporary value that will get
+#quickly overwritten in the next iteration of the loop.
+#in those cases, we don't actually have to do that assignment at all;
+#just put that expression in the conditional of the loop.
+
+b = c = 84
+if a != 0:
+    b = b*100 + 100000
+    c = b + 17000
+while True:
+    f = 1
+    d = 2
+    do{
+        e = 2
+        do{
+            if d * e == b:
+                f = 0
+            e += 1
+        }(while e != b);
+        d += 1
+    }(while d != b);
+    if f == 0:
+        h +=1
+    if  b == c:
+        exit()
+    b += 17
+
+########## ver 0.6 - for loops ##########
+#hey, these loops are just iterating up.
+
+b = c = 84
+if a != 0:
+    b = b*100 + 100000
+    c = b + 17000
+for b in range(b, c+1, 17):
+    f = 1
+    for d in range(2, b):
+        for e in range(2, b):
+            if d * e == b:
+                f = 0
+    if f == 0:
+        h +=1
+
+########## ver 1.0 - determine intent ##########
+#so f gets flagged whenever we find two numbers that multiply together to make b.
+#and h gets incremented every time f is flagged.
+#in other words, h is the number of composite numbers in the range between b and c, with a step of 17.
